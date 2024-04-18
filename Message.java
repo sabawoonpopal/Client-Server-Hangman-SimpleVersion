@@ -11,7 +11,7 @@ public class Message implements Serializable
     // instance variables - replace the example below with your own
     private String name;
     private String messageContent;
-
+    private char[] splittedWord;
     /**
      * Constructor for objects of class Message
      */
@@ -21,6 +21,14 @@ public class Message implements Serializable
         name = inputtedName;
         messageContent = inputtedResponse;
     }
+    
+    public Message(String inputtedName, String inputtedResponse, char[] theSplittedWord)
+    {
+        name = inputtedName;
+        messageContent = inputtedResponse;
+        splittedWord = theSplittedWord;
+    }
+    
     
     public String getName()
     {
@@ -41,5 +49,14 @@ public class Message implements Serializable
     {
         messageContent = inputtedMessage;
     }
+    
+    public char[] getSplittedWord()
+    {
+        return splittedWord;
+    }
+    
+    public void setSplittedWord(char[] newSplittedWord)
+    {
+        splittedWord = newSplittedWord;
+    }
 }
-
