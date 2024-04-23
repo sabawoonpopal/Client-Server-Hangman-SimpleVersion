@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 1995, 2013, Oracle and/or its affiliates. All rights reserved.
  *
@@ -68,15 +69,15 @@ public class IMClient {
             // STEP 5: RECEIVE MESSAGE FROM SERVER.
             while ((fromServer = (Message)in.readObject()) != null) {
                 
-                if (fromServer.getMessageContent().equals("Bye"))
-                    break;
+                //if (fromServer.getMessageContent().equals("Bye"))
+                //    break;
                     
                 // STEP 6: PRINT MESSAGE FROM SERVER.
                 // CSC LAB 450 LAB 6: READ MESSAGE COMING IN FROM SERVER.
                 try
                 {
                     // Message receivedMessage = (Message)in.readObject();
-                    System.out.println(fromServer.getName() + ": " + fromServer.getMessageContent());
+                    System.out.println(fromServer.getName() + fromServer.getMessageContent());
                 }
                 catch (Exception cnfe)
                 {
@@ -94,18 +95,20 @@ public class IMClient {
                 // Reads in what the client will send.
                 fromUser = stdIn.readLine();
                 
-                if (fromUser != null) 
+                if (fromUser != null && fromUser.length() != 1) 
                 {
-                    //System.out.println("Client: " + fromUser);
-                    // 
-                    // STEP 8: SEND RESPONSE TO SERVER.
-                    // 
                     Message clientMessage = new Message(clientName, fromUser);
                     // out.println(fromUser); // CSC 450 LAB 6: WE ARE NOW SENDING A MESSAGE OBJECT,
                                               // NOT A SIMPLE STRING. USE THE LINE BELOW:
-                    System.out.println(clientMessage.getName() + ": " + clientMessage.getMessageContent());
+                    System.out.println(clientMessage.getName() + clientMessage.getMessageContent());
                     out.writeObject(clientMessage);
                 }
+                if(fromUser.length() == 1)
+                    {
+                        char charFromUser = fromUser.charAt(0);
+                        Message clientMessage = new Message(clientName, charFromUser);
+                        out.writeObject(clientMessage);
+                    }
             }
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host " + hostName);
