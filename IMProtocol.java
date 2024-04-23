@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 1995, 2008, Oracle and/or its affiliates. All rights reserved.
  *
@@ -31,28 +32,41 @@
 
 import java.net.*;
 import java.io.*;
-
+import java.util.Random;
 public class IMProtocol {
     private static final int WAITING = 0;
-    private static final int IN_CONVERSATION = 1;
-    //private static final int SENTCLUE = 2;
-    //private static final int ANOTHER = 3;
-
+    private static final int IN_GAME = 1;
+    private static final int FINISHED_GAME = 2;
+    private static final int REQUEST_NEW_GAME = 3;
+    private static final int NEW_GAME = 4;
+    
+    private int attemptsLeft = 6;
     //private static final int NUMJOKES = 6;
 
+    
+    
+    private char letterFound = ' ';
+    
     private int state = WAITING;
     //private int currentJoke = 0;
 
+    
+    Random random = new Random();
+    
+    private int chosenWord = 0;//random.nextInt(5);
+    
     // CSC450 LAB3: NO LONGER NEED KNOCK KNOCK JOKES FOR THIS ASSIGNMENT. (IM (Instant Messaging Lab))
-    //private String[] clues = { "Turnip", "Little Old Lady", "Atch", "Who", "Who", "BOO!"};
+    private String[] words = { "Turnip"};//, "Little", "Atch", "Who", "BOO!"};
     //private String[] answers = { "Turnip the heat, it's cold in here!",
                                  //"I didn't know you could yodel!",
                                  //"Bless you!",
                                  //"Is there an owl in here?",
                                  //"Is there an echo in here?",
                                  //"Don't cry, it is just a joke."};
-
-
+                                 
+    private char[] splittedWord = words[chosenWord].toCharArray();   
+    private char[] guessedWord = new char[splittedWord.length];
+    private int amountOfLetters = guessedWord.length;
     // TENTH STEP: DOCUMENTING THE PROCESSINPUT METHOD.
     /**
      * processInput - Processes the input that the user gives.
@@ -60,7 +74,7 @@ public class IMProtocol {
      * @param - String that the user enters. (Possibilities: Who's there?, y, n, (clues[currentJoke]) + who?)
      * @return - String that the server should send back based on the client response.
      */
-    public String processInput(String theInput) 
+    public String processInput(Message theInput) 
     {
         String theOutput = null;
         // CSC 450 LAB 3: MODIFYING KNOCK KNOCK PROTOCOL SO THAT THE SERVER SAYS "Connection Established"
@@ -69,17 +83,73 @@ public class IMProtocol {
         // CSC 450 LAB 3: ADDING BUFFERED READER SO WE CAN SEND MESSAGES ON THE SERVER SIDE AS WELL.
         BufferedReader stdIn =
                 new BufferedReader(new InputStreamReader(System.in));
+        
         if (state == WAITING) {
-            theOutput = "Connection Established.";
+            theOutput = "Welcome to hangman! A word has already been selected. You have 6 attempts\nto guess the word!";
             // The status of the IM is in the middle of a conversation when a connection is established.
-            state = IN_CONVERSATION;
-        } else if (state == IN_CONVERSATION) {
-            if (theInput.equalsIgnoreCase("Bye")) 
+            
+        
+            
+            state = IN_GAME;
+        } else if (state == IN_GAME) {
+            if (attemptsLeft > 0) 
             {
                 // Make the server send an automated "Bye" when there is a "Bye" sent on the client side.
-                theOutput = "Bye";
+                try
+                {
+                    char guessedLetter = theInput.getCharContent();
+                    System.out.println("HAHA " + guessedLetter);
+                    boolean found = false;
+                    for(int i = 0; i < splittedWord.length; i++)
+                    {
+                        if(splittedWord[i] == guessedLetter)
+                        {
+                            found = true;
+                            guessedWord[i] = guessedLetter;
+                            theOutput = "Good job! " + guessedLetter + " was in the word!";
+                            
+                            for (int j = 0; j < guessedWord.length; j++)
+                            {
+                                if(guessedWord[j] == '\u0000')
+                                {
+                                    guessedWord[j] = '_';
+                                    
+                                    theOutput += " " + guessedWord[j];
+                                }
+                                else
+                                {
+                                    theOutput += " " + guessedWord[j];
+                                }
+                            }
+                        }
+                    }
+                    for(int k = 0; k < guessedWord.length; k++)
+                    {
+                        int count = 0;
+                        if(guessedWord[k] != '_')
+                        {
+                            count++;
+                        }
+                        
+                        if(count == amountOfLetters)
+                        {
+                            theOutput = "CONGRAULATIONS! YOU WIN THE GAME!";
+                            state = REQUEST_NEW_GAME;
+                        }
+                    }
+                    if(!found)
+                    {
+                        theOutput = "I'm sorry, " + guessedLetter + " is not in the word.";
+                        attemptsLeft--;
+                    }
+                }
+                catch(IllegalArgumentException e)
+                {
+                    theOutput = "You entered more than one character, or an illegal character. Please try again.";
+                }
+                
                 // Make the status back to WAITING so protocol knows its not in conversation.
-                state = WAITING;
+                
                 // try
                 // {
                     // theOutput = stdIn.readLine();
@@ -118,20 +188,35 @@ public class IMProtocol {
                     // }
                 // }
             }
-            else if (state == IN_CONVERSATION)
+            else
             {
-                // Set space to show that its the servers turn to send message.
-                // System.out.print("Server: ");
-                try
-                {
-                    // Allow to send messages manually on server side, thanks to BufferedReader object.
-                    theOutput = stdIn.readLine();
-                }
-                catch (IOException ioe)
-                {
-                    ioe.printStackTrace();
-                }//"How are you?";
+                theOutput = "Game over. You lose.";
+                state = WAITING;
             }
+            // else if (state == IN_GAME)
+            // {
+                // // Set space to show that its the servers turn to send message.
+                // // System.out.print("Server: ");
+                // try
+                // {
+                    // // Allow to send messages manually on server side, thanks to BufferedReader object.
+                    // theOutput = stdIn.readLine();
+                // }
+                // catch (IOException ioe)
+                // {
+                    // ioe.printStackTrace();
+                // }//"How are you?";
+            // }
+        }
+        else if(state == NEW_GAME)
+        {
+            chosenWord = random.nextInt(5);
+            splittedWord = words[chosenWord].toCharArray();
+            guessedWord = new char[splittedWord.length];
+            
+            state = IN_GAME;
+            
+            theOutput = "Another game has started! Good luck!";
         }
         // Reurn the string representing the sent message.
         return theOutput;
