@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 1995, 2014, Oracle and/or its affiliates. All rights reserved.
  *
@@ -37,14 +38,14 @@ public class IMServer {
         
         // CSC 450 LAB 6: ARGS LENGTH WILL BE 2 NOW, SINCE WE NEED AN EXTRA ARGS ELEMENT TO
         // WRITE THE NAME OF THE SERVER IN THE COMMAND LINE.
-        if (args.length != 2) {
+        if (args.length != 1) {
             System.err.println("Usage: java IMServer <port number>");
             System.exit(1);
         }
 
         int portNumber = Integer.parseInt(args[0]);
         // CSC 450 LAB 6: SAVE THE NAME OF THE SERVER FROM COMMAND LINE ARGUMENT.
-        String serverName = args[1];
+        
         try ( 
             // FIRST STEP: LISTEN ON A SPECIFIC PORT FOR A CONNECTION REQUEST.
             // SECOND STEP IN THE CLIENT CLASS.
@@ -64,7 +65,7 @@ public class IMServer {
             // Initiate conversation with client
             IMProtocol imp = new IMProtocol();
             outputLine = imp.processInput(null);
-            Message sendToClient = new Message(serverName, outputLine);
+            Message sendToClient = new Message("Server:", outputLine);
             
             out.writeObject(sendToClient);
             
@@ -80,7 +81,7 @@ public class IMServer {
                 //try
                 //{
                     //receivedMessage = fromClient;//(Message)in.readObject();
-                    System.out.println(fromClient.getName() + ": " + fromClient.getMessageContent());//("Client: " + inputLine);
+                    System.out.println(fromClient.getName() + ": " + fromClient.getCharContent());//("Client: " + inputLine);
                 //}
                 //catch (ClassNotFoundException cnfe)               // WE DO NOT NEED A TRY-CATCH
                                                                     // BECAUSE WERE READING OBJECT
@@ -91,11 +92,11 @@ public class IMServer {
                 //}
 
                 // TENTH STEP: DETERMINE SERVER'S REPLY.
-                outputLine = imp.processInput(fromClient.getMessageContent());
+                outputLine = imp.processInput(fromClient);
                 
                 
                 // ELEVENTH STEP: SEND SERVER'S REPLY TO CLIENT.
-                Message serversReply = new Message(serverName, outputLine);
+                Message serversReply = new Message("Server: ", outputLine);
                 out.writeObject(serversReply);
                 System.out.println(serversReply.getName() + ": " + serversReply.getMessageContent()); // Display own message on own terminal.
                 
