@@ -69,6 +69,10 @@ public class IMClient {
             // STEP 5: RECEIVE MESSAGE FROM SERVER.
             while ((fromServer = (Message)in.readObject()) != null) {
                 
+                if(fromServer.getMessageContent().equals("Goodbye!"))
+                {
+                    break;
+                }
                 //if (fromServer.getMessageContent().equals("Bye"))
                 //    break;
                     
@@ -100,7 +104,7 @@ public class IMClient {
                     Message clientMessage = new Message(clientName, fromUser);
                     // out.println(fromUser); // CSC 450 LAB 6: WE ARE NOW SENDING A MESSAGE OBJECT,
                                               // NOT A SIMPLE STRING. USE THE LINE BELOW:
-                    System.out.println(clientMessage.getName() + clientMessage.getMessageContent());
+                    System.out.println(clientMessage.getMessageContent());
                     out.writeObject(clientMessage);
                 }
                 if(fromUser.length() == 1)
