@@ -101,7 +101,7 @@ public class IMServer {
                 System.out.println(serversReply.getName() + ": " + serversReply.getMessageContent()); // Display own message on own terminal.
                 
                 // End the conversation if server says bye.
-                if (outputLine.equals("Bye"))
+                if (outputLine.equals("Goodbye!"))
                     break;
               
             }
