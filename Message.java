@@ -65,6 +65,7 @@ public class Message implements Serializable
     {
         return stringMessageContent;
     }
+    
     public void setMessage(char inputtedMessage)
     {
         messageContent = inputtedMessage;
