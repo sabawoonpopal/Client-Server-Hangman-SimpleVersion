@@ -39,21 +39,20 @@ public class IMProtocol {
     private static final int FINISHED_GAME = 2;
     private static final int REQUEST_NEW_GAME = 3;
     private static final int NEW_GAME = 4;
-    
-    private int attemptsLeft = 6;
+    private int attemptsLeft;
     //private static final int NUMJOKES = 6;
 
     
     
-    private char letterFound = ' ';
+    private char letterFound;
     
     private int state = WAITING;
     //private int currentJoke = 0;
 
     
-    Random random = new Random();
+    Random random;
     
-    private int chosenWord = 0;//random.nextInt(5);
+    private int chosenWord;//random.nextInt(5);
     
     // CSC450 LAB3: NO LONGER NEED KNOCK KNOCK JOKES FOR THIS ASSIGNMENT. (IM (Instant Messaging Lab))
     private String[] words = { "Turnip"};//, "Little", "Atch", "Who", "BOO!"};
@@ -64,9 +63,9 @@ public class IMProtocol {
                                  //"Is there an echo in here?",
                                  //"Don't cry, it is just a joke."};
                                  
-    private char[] splittedWord = words[chosenWord].toCharArray();   
-    private char[] guessedWord = new char[splittedWord.length];
-    private int amountOfLetters = guessedWord.length;
+    private char[] splittedWord;  
+    private char[] guessedWord;
+    private int amountOfLetters;
     // TENTH STEP: DOCUMENTING THE PROCESSINPUT METHOD.
     /**
      * processInput - Processes the input that the user gives.
@@ -88,8 +87,14 @@ public class IMProtocol {
             theOutput = "Welcome to hangman! A word has already been selected. You have 6 attempts\nto guess the word!";
             // The status of the IM is in the middle of a conversation when a connection is established.
             
-        
-            
+            attemptsLeft = 6;
+            letterFound = ' ';
+            random = new Random();
+            chosenWord = 0;
+            splittedWord = words[chosenWord].toCharArray();   
+            guessedWord = new char[splittedWord.length];
+            amountOfLetters = guessedWord.length;
+                
             state = IN_GAME;
         } else if (state == IN_GAME) {
             if (attemptsLeft > 0) 
@@ -123,17 +128,19 @@ public class IMProtocol {
                             }
                         }
                     }
+                    int count = 0;
                     for(int k = 0; k < guessedWord.length; k++)
                     {
-                        int count = 0;
-                        if(guessedWord[k] != '_')
+                        
+                        if(guessedWord[k] == splittedWord[k])
                         {
                             count++;
                         }
                         
                         if(count == amountOfLetters)
                         {
-                            theOutput = "CONGRAULATIONS! YOU WIN THE GAME!";
+                            theOutput = "CONGRAULATIONS! YOU WIN THE GAME! Would you like to play again?";
+                            
                             state = REQUEST_NEW_GAME;
                         }
                     }
@@ -190,8 +197,9 @@ public class IMProtocol {
             }
             else
             {
-                theOutput = "Game over. You lose.";
-                state = WAITING;
+                theOutput = "Game over. You lose. Would you like to play again?";
+                state = REQUEST_NEW_GAME;
+                //state = REQUEST_NEW_GAME;
             }
             // else if (state == IN_GAME)
             // {
@@ -208,16 +216,36 @@ public class IMProtocol {
                 // }//"How are you?";
             // }
         }
+        else if (state == REQUEST_NEW_GAME)
+        {
+            if(theInput.getCharContent() == 'y')
+            {
+                // chosenWord = random.nextInt(5);
+                // splittedWord = words[chosenWord].toCharArray();
+                // guessedWord = new char[splittedWord.length];
+                // attemptsLeft = 6;
+                // amountOfLetters = guessedWord.length;
+                theOutput = "Another game has started! Good luck!";
+                
+                state = WAITING;
+            }
+            else
+            {
+                theOutput = "Goodbye!";
+            }
+        }
         else if(state == NEW_GAME)
         {
-            chosenWord = random.nextInt(5);
-            splittedWord = words[chosenWord].toCharArray();
-            guessedWord = new char[splittedWord.length];
+            // chosenWord = random.nextInt(5);
+            // splittedWord = words[chosenWord].toCharArray();
+            // guessedWord = new char[splittedWord.length];
+            // attemptsLeft = 6;
             
-            state = IN_GAME;
+            // state = IN_GAME;
             
-            theOutput = "Another game has started! Good luck!";
+            // theOutput = "Another game has started! Good luck!";
         }
+        
         // Reurn the string representing the sent message.
         return theOutput;
     }
